@@ -1,6 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { FILTERS } from '../constants';
-import { applyEnhancements, getSmartCropRegion } from '../utils/imageEnhancement';
 
 export function useCamera() {
   const videoRef = useRef(null);
@@ -65,40 +64,17 @@ export function useCamera() {
     startCamera(newFacing);
   }, [facingMode, startCamera]);
 
-  /**
-   * Capture a photo with optional filter, AI enhancements, and smart crop
-   */
-  const capturePhoto = useCallback((
-    filterId = 'normal',
-    enhancementOptions = {},
-    virtualBgColors = null,
-  ) => {
+  const capturePhoto = useCallback((filterId = 'normal') => {
     if (!videoRef.current) return null;
     const video = videoRef.current;
     const canvas = document.createElement('canvas');
-    const w = video.videoWidth || 640;
-    const h = video.videoHeight || 480;
-
-    // Apply smart crop to get a better-framed photo
-    const { sx, sy, sw, sh } = getSmartCropRegion(w, h, 4 / 3);
-
-    canvas.width = sw;
-    canvas.height = sh;
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext('2d');
-
-    // Draw virtual background if provided
-    if (virtualBgColors && virtualBgColors.length >= 2) {
-      const grad = ctx.createLinearGradient(0, 0, sw, sh);
-      virtualBgColors.forEach((color, i) => {
-        grad.addColorStop(i / (virtualBgColors.length - 1), color);
-      });
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, sw, sh);
-    }
 
     // Mirror for front camera
     if (facingMode === 'user') {
-      ctx.translate(sw, 0);
+      ctx.translate(canvas.width, 0);
       ctx.scale(-1, 1);
     }
 
@@ -108,19 +84,7 @@ export function useCamera() {
       ctx.filter = filter.css;
     }
 
-    // Draw the video frame cropped
-    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
-
-    // Reset transform for enhancement
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.filter = 'none';
-
-    // Apply AI enhancements if any are enabled
-    const hasEnhancements = Object.values(enhancementOptions).some(Boolean);
-    if (hasEnhancements) {
-      return applyEnhancements(canvas, enhancementOptions);
-    }
-
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     return canvas.toDataURL('image/jpeg', 0.92);
   }, [facingMode]);
 

@@ -1,6 +1,4 @@
-import { STRIP_THEMES } from '../constants';
-import { WALLPAPERS } from '../constants/wallpapers';
-import { getFilterCSS } from './filterRenderer';
+import { STRIP_THEMES, FILTERS } from '../constants';
 
 /**
  * Generate a photo strip canvas from an array of photo dataURLs
@@ -12,13 +10,8 @@ export async function generateStrip({
   themeId = 'minimal',
   customText = '',
   showDate = true,
-  wallpaperId = 'none',
-  filterId = 'normal',
-  filterIntensity = 1.0,
 }) {
   const theme = STRIP_THEMES.find(t => t.id === themeId) || STRIP_THEMES[0];
-  const wallpaper = WALLPAPERS.find(w => w.id === wallpaperId) || WALLPAPERS[0];
-  const filterCss = getFilterCSS(filterId, filterIntensity);
 
   return new Promise((resolve) => {
     const loadImage = (src) =>
@@ -48,7 +41,7 @@ export async function generateStrip({
         canvas.height = stripH;
 
         // Background
-        drawBackground(ctx, canvas.width, canvas.height, theme, radius, wallpaper);
+        drawBackground(ctx, canvas.width, canvas.height, theme, radius);
 
         // Border rect
         ctx.strokeStyle = theme.border;
@@ -59,7 +52,7 @@ export async function generateStrip({
         images.forEach((img, i) => {
           const x = padding + border;
           const y = border + padding + i * (photoH + padding);
-          drawPhoto(ctx, img, x, y, photoW, photoH, radius > 4 ? radius - 4 : 0, filterCss);
+          drawPhoto(ctx, img, x, y, photoW, photoH, radius > 4 ? radius - 4 : 0);
         });
 
         // Date & text
@@ -85,7 +78,7 @@ export async function generateStrip({
         canvas.width = stripW;
         canvas.height = stripH;
 
-        drawBackground(ctx, canvas.width, canvas.height, theme, radius, wallpaper);
+        drawBackground(ctx, canvas.width, canvas.height, theme, radius);
         ctx.strokeStyle = theme.border;
         ctx.lineWidth = border;
         ctx.strokeRect(border / 2, border / 2, canvas.width - border, canvas.height - border);
@@ -95,7 +88,7 @@ export async function generateStrip({
           const row = Math.floor(i / cols);
           const x = border + gap + col * (pw + gap);
           const y = border + gap + row * (ph + gap);
-          drawPhoto(ctx, img, x, y, pw, ph, radius > 4 ? radius - 4 : 0, filterCss);
+          drawPhoto(ctx, img, x, y, pw, ph, radius > 4 ? radius - 4 : 0);
         });
 
         const bottomY = border + gap + rows * (ph + gap);
@@ -136,7 +129,7 @@ export async function generateStrip({
           ctx.shadowBlur = 0;
           ctx.shadowOffsetY = 0;
           // Photo
-          drawPhoto(ctx, img, x, y, pw, ph, 2, filterCss);
+          drawPhoto(ctx, img, x, y, pw, ph, 2);
           // Caption line
           const caption = i === 0 ? '✦ boothly' : '';
           if (caption) {
@@ -180,7 +173,7 @@ export async function generateStrip({
         images.forEach((img, i) => {
           const x = sideW;
           const y = sprocketH + gap + i * (ph + gap);
-          drawPhoto(ctx, img, x, y, pw, ph, 0, filterCss);
+          drawPhoto(ctx, img, x, y, pw, ph, 0);
         });
 
         // Film grain overlay
@@ -209,7 +202,7 @@ export async function generateStrip({
   });
 }
 
-function drawBackground(ctx, w, h, theme, radius, wallpaper = null) {
+function drawBackground(ctx, w, h, theme, radius) {
   if (theme.bg.startsWith('linear-gradient')) {
     const grad = ctx.createLinearGradient(0, 0, w, h);
     const match = theme.bg.match(/#[A-Fa-f0-9]{6}/g);
@@ -228,21 +221,9 @@ function drawBackground(ctx, w, h, theme, radius, wallpaper = null) {
     ctx.fillRect(0, 0, w, h);
   }
 
-  // Wallpaper overlay
-  if (wallpaper && wallpaper.id !== 'none' && wallpaper.canvasColors?.length >= 2) {
-    const grad = ctx.createLinearGradient(0, 0, w, h);
-    wallpaper.canvasColors.forEach((color, i, arr) => {
-      grad.addColorStop(i / (arr.length - 1), color);
-    });
-    ctx.globalAlpha = 0.55;
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
-    ctx.globalAlpha = 1;
-  }
-
   // Subtle paper texture
-  ctx.globalAlpha = 0.025;
-  for (let i = 0; i < 600; i++) {
+  ctx.globalAlpha = 0.03;
+  for (let i = 0; i < 800; i++) {
     const x = Math.random() * w;
     const y = Math.random() * h;
     ctx.fillStyle = Math.random() > 0.5 ? '#fff' : '#000';
@@ -251,11 +232,8 @@ function drawBackground(ctx, w, h, theme, radius, wallpaper = null) {
   ctx.globalAlpha = 1;
 }
 
-function drawPhoto(ctx, img, x, y, w, h, radius, filterCss = 'none') {
+function drawPhoto(ctx, img, x, y, w, h, radius) {
   ctx.save();
-  if (filterCss && filterCss !== 'none') {
-    ctx.filter = filterCss;
-  }
   if (radius > 0) {
     roundRect(ctx, x, y, w, h, radius);
     ctx.clip();
@@ -275,7 +253,6 @@ function drawPhoto(ctx, img, x, y, w, h, radius, filterCss = 'none') {
     sy = (img.height - sh) / 2;
   }
   ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
-  ctx.filter = 'none';
   ctx.restore();
 }
 
