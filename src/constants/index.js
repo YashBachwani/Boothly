@@ -213,3 +213,5 @@ export const BOOTH_FRAMES = [
   { id: 'stars', name: 'Stars', icon: '✨' },
   { id: 'minimal', name: 'Minimal', icon: '□' },
 ];
+
+export { VIRTUAL_BACKGROUNDS, MUSIC_TRACKS } from './backgrounds.js';

@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas';
 import { useBooth } from '../../context/BoothContext';
 import StripCanvas from './StripCanvas';
 import StickerLayer from './StickerLayer';
+import TextEditor from './TextEditor';
 
 export default function DownloadShare() {
   const { newSession, setStep, stickers } = useBooth();
@@ -74,11 +75,17 @@ export default function DownloadShare() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="section"
       style={{
-        display: 'flex', gap: '40px', flexWrap: 'wrap',
-        justifyContent: 'center', alignItems: 'flex-start',
+        display: 'flex',
+        gap: 'clamp(16px, 4vw, 40px)',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        padding: 'clamp(16px, 4vw, 40px)',
         paddingTop: '20px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        width: '100%',
       }}
     >
       {/* Final Preview Container */}
@@ -92,9 +99,10 @@ export default function DownloadShare() {
         >
           {/* Base strip generated via canvas API */}
           <StripCanvas />
-          
           {/* Read-only stickers overlay */}
           <StickerLayer readOnly />
+          {/* Read-only text overlay */}
+          <TextEditor readOnly />
         </div>
 
         {isExporting && (
@@ -111,7 +119,7 @@ export default function DownloadShare() {
       </div>
 
       {/* Action panel */}
-      <div className="glass-card" style={{ padding: '32px', minWidth: '300px', maxWidth: '400px' }}>
+      <div className="glass-card" style={{ padding: 'clamp(20px, 4vw, 32px)', minWidth: 'min(300px, 100%)', maxWidth: '400px', flex: '1' }}>
         <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.8rem', color: 'var(--text-primary)', marginBottom: '8px' }}>
           Your <span className="gradient-text">memories</span>, ready.
         </h3>
