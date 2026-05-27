@@ -1,12 +1,23 @@
 import { motion } from 'framer-motion';
 import { useBooth } from '../../context/BoothContext';
 import { STRIP_THEMES, LAYOUTS } from '../../constants';
+import AIEnhancementPanel from '../booth/AIEnhancementPanel';
 
 export default function StripThemer() {
   const { stripTheme, setTheme, stripLayout, setLayout, customText, setCustomText } = useBooth();
 
   return (
     <div className="glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      {/* Smart Enhancements */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h4 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>AI Enhance</h4>
+          <div style={{ position: 'relative' }}>
+            <AIEnhancementPanel />
+          </div>
+        </div>
+      </div>
+
       {/* Layout Selection */}
       <div>
         <h4 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Layout</h4>

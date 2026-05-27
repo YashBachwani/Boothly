@@ -5,12 +5,15 @@ export const FILTERS = [
   { id: 'retro', name: 'Retro Film', css: 'sepia(40%) hue-rotate(-20deg) saturate(150%) contrast(105%)', icon: '🎬' },
   { id: 'glow', name: 'Soft Glow', css: 'brightness(115%) contrast(88%) saturate(110%)', icon: '🌸' },
   { id: 'warm', name: 'Warm', css: 'sepia(25%) saturate(130%) hue-rotate(5deg) brightness(105%)', icon: '🌅' },
-  { id: 'cold', name: 'Cold', css: 'hue-rotate(195deg) saturate(70%) brightness(108%)', icon: '❄️' },
+  { id: 'cool', name: 'Cool', css: 'hue-rotate(195deg) saturate(70%) brightness(108%)', icon: '❄️' },
   { id: 'dreamy', name: 'Dreamy', css: 'brightness(112%) saturate(120%) contrast(90%)', icon: '☁️' },
   { id: 'kawaii', name: 'Kawaii', css: 'saturate(175%) brightness(112%) hue-rotate(325deg) contrast(95%)', icon: '🌷' },
-  { id: 'cinematic', name: 'Cinematic', css: 'contrast(125%) brightness(82%) saturate(75%)', icon: '🎥' },
   { id: 'polaroid', name: 'Polaroid', css: 'contrast(108%) brightness(106%) saturate(88%) sepia(12%)', icon: '📸' },
   { id: 'sepia', name: 'Sepia', css: 'sepia(100%) contrast(105%)', icon: '🍂' },
+  { id: 'vhs', name: 'VHS', css: 'contrast(120%) saturate(180%) hue-rotate(10deg) brightness(95%)', icon: '📼' },
+  { id: 'cyberpunk', name: 'Cyberpunk', css: 'contrast(130%) saturate(200%) hue-rotate(290deg) brightness(85%)', icon: '🚀' },
+  { id: 'sunset', name: 'Sunset Glow', css: 'sepia(30%) saturate(160%) hue-rotate(-15deg) brightness(110%) contrast(110%)', icon: '🌇' },
+  { id: 'filmgrain', name: 'Film Grain', css: 'sepia(15%) contrast(115%) saturate(85%) brightness(95%)', icon: '🎞️' },
 ];
 
 export const STRIP_THEMES = [
@@ -154,43 +157,72 @@ export const STICKERS = [
   { id: 's4', emoji: '💙', category: 'hearts' },
   { id: 's5', emoji: '🤍', category: 'hearts' },
   { id: 's6', emoji: '💕', category: 'hearts' },
-  // Stars
+  // Stars & Sparkles
   { id: 's7', emoji: '⭐', category: 'stars' },
   { id: 's8', emoji: '✨', category: 'stars' },
   { id: 's9', emoji: '🌟', category: 'stars' },
   { id: 's10', emoji: '💫', category: 'stars' },
   { id: 's11', emoji: '🌙', category: 'stars' },
-  // Flowers
-  { id: 's12', emoji: '🌸', category: 'flowers' },
-  { id: 's13', emoji: '🌷', category: 'flowers' },
-  { id: 's14', emoji: '🌻', category: 'flowers' },
-  { id: 's15', emoji: '🌹', category: 'flowers' },
-  { id: 's16', emoji: '🌼', category: 'flowers' },
-  // Fun
-  { id: 's17', emoji: '🎀', category: 'fun' },
-  { id: 's18', emoji: '🎉', category: 'fun' },
-  { id: 's19', emoji: '🎊', category: 'fun' },
-  { id: 's20', emoji: '🦋', category: 'fun' },
-  { id: 's21', emoji: '🍓', category: 'fun' },
-  { id: 's22', emoji: '🌈', category: 'fun' },
-  // Face
-  { id: 's23', emoji: '😊', category: 'face' },
-  { id: 's24', emoji: '🥰', category: 'face' },
-  { id: 's25', emoji: '😎', category: 'face' },
-  { id: 's26', emoji: '🤩', category: 'face' },
-  { id: 's27', emoji: '😈', category: 'face' },
-  // Aesthetic
-  { id: 's28', emoji: '🫧', category: 'aesthetic' },
-  { id: 's29', emoji: '🍵', category: 'aesthetic' },
-  { id: 's30', emoji: '📷', category: 'aesthetic' },
-  { id: 's31', emoji: '🎞️', category: 'aesthetic' },
-  { id: 's32', emoji: '🪩', category: 'aesthetic' },
-  { id: 's33', emoji: '🌊', category: 'aesthetic' },
-  { id: 's34', emoji: '🕯️', category: 'aesthetic' },
-  { id: 's35', emoji: '🫀', category: 'aesthetic' },
+  // Emoji & Face
+  { id: 's23', emoji: '😊', category: 'emoji' },
+  { id: 's24', emoji: '🥰', category: 'emoji' },
+  { id: 's25', emoji: '😎', category: 'emoji' },
+  { id: 's26', emoji: '🤩', category: 'emoji' },
+  { id: 's27', emoji: '😈', category: 'emoji' },
+  // Kawaii Doodles
+  { id: 'k1', emoji: '🎀', category: 'kawaii' },
+  { id: 'k2', emoji: '🌸', category: 'kawaii' },
+  { id: 'k3', emoji: '🍡', category: 'kawaii' },
+  { id: 'k4', emoji: '🍓', category: 'kawaii' },
+  { id: 'k5', emoji: '🧸', category: 'kawaii' },
+  { id: 'k6', emoji: '🌈', category: 'kawaii' },
+  // Retro & Sunglasses
+  { id: 'r1', emoji: '📼', category: 'retro' },
+  { id: 'r2', emoji: '🪩', category: 'retro' },
+  { id: 'r3', emoji: '🕶️', category: 'retro' },
+  { id: 'r4', emoji: '🛼', category: 'retro' },
+  { id: 'r5', emoji: '📺', category: 'retro' },
+  // Tape & Effects
+  { id: 't1', emoji: '🩹', category: 'effects' },
+  { id: 't2', emoji: '📎', category: 'effects' },
+  { id: 't3', emoji: '📌', category: 'effects' },
+  { id: 't4', emoji: '🫧', category: 'effects' },
+  { id: 't5', emoji: '💨', category: 'effects' },
+  // Festival (Birthday/Wedding/Diwali)
+  { id: 'f1', emoji: '🎂', category: 'festival' },
+  { id: 'f2', emoji: '🎉', category: 'festival' },
+  { id: 'f3', emoji: '💍', category: 'festival' },
+  { id: 'f4', emoji: '🎆', category: 'festival' },
+  { id: 'f5', emoji: '🎓', category: 'festival' },
+  { id: 'f6', emoji: '🎄', category: 'festival' },
+  // Anime
+  { id: 'a1', emoji: '💢', category: 'anime' },
+  { id: 'a2', emoji: '💦', category: 'anime' },
+  { id: 'a3', emoji: '💤', category: 'anime' },
+  { id: 'a4', emoji: '💬', category: 'anime' },
+  { id: 'a5', emoji: '🌀', category: 'anime' },
 ];
 
-export const STICKER_CATEGORIES = ['hearts', 'stars', 'flowers', 'fun', 'face', 'aesthetic'];
+export const STICKER_CATEGORIES = ['hearts', 'stars', 'emoji', 'kawaii', 'retro', 'effects', 'festival', 'anime'];
+
+export const FONTS = [
+  // Aesthetic
+  { id: 'f_caveat', name: 'Caveat', family: 'Caveat', category: 'Aesthetic' },
+  { id: 'f_pacifico', name: 'Pacifico', family: 'Pacifico', category: 'Aesthetic' },
+  { id: 'f_dancing', name: 'Dancing Script', family: 'Dancing Script', category: 'Aesthetic' },
+  // Retro
+  { id: 'f_playfair', name: 'Playfair', family: 'Playfair Display', category: 'Retro' },
+  { id: 'f_special_elite', name: 'Special Elite', family: 'Special Elite', category: 'Retro' },
+  { id: 'f_press_start', name: 'Arcade', family: '"Press Start 2P"', category: 'Retro' },
+  // Minimal
+  { id: 'f_inter', name: 'Inter', family: 'Inter', category: 'Minimal' },
+  { id: 'f_poppins', name: 'Poppins', family: 'Poppins', category: 'Minimal' },
+  // Cute
+  { id: 'f_nunito', name: 'Nunito', family: 'Nunito', category: 'Cute' },
+  { id: 'f_quicksand', name: 'Quicksand', family: 'Quicksand', category: 'Cute' },
+];
+
+export const FONT_CATEGORIES = ['Aesthetic', 'Retro', 'Minimal', 'Cute'];
 
 export const LAYOUTS = [
   { id: 'vertical', name: 'Classic Strip', icon: '▌', description: '1 × N vertical strip' },

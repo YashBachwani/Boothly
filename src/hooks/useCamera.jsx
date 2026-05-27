@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { FILTERS } from '../constants';
+import { VIRTUAL_BACKGROUNDS } from '../constants/backgrounds';
 
 export function useCamera() {
   const videoRef = useRef(null);
@@ -64,13 +65,34 @@ export function useCamera() {
     startCamera(newFacing);
   }, [facingMode, startCamera]);
 
-  const capturePhoto = useCallback((filterId = 'normal') => {
+  const capturePhoto = useCallback((filterId = 'normal', activeBackgroundId = 'none') => {
     if (!videoRef.current) return null;
     const video = videoRef.current;
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth || 640;
     canvas.height = video.videoHeight || 480;
     const ctx = canvas.getContext('2d');
+
+    const activeBg = VIRTUAL_BACKGROUNDS.find(b => b.id === activeBackgroundId) || VIRTUAL_BACKGROUNDS[0];
+
+    // 1. Draw Virtual Background (if any)
+    if (activeBg.id !== 'none' && activeBg.canvasColors) {
+      let grd;
+      if (activeBg.css && activeBg.css.includes('radial')) {
+        grd = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height));
+      } else {
+        grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      }
+      const steps = activeBg.canvasColors.length;
+      activeBg.canvasColors.forEach((color, idx) => {
+        grd.addColorStop(idx / Math.max(1, steps - 1), color);
+      });
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Set blend mode for the video layer
+      ctx.globalCompositeOperation = 'soft-light';
+    }
 
     // Mirror for front camera
     if (facingMode === 'user') {
@@ -85,6 +107,22 @@ export function useCamera() {
     }
 
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Reset composite operation and add ambient overlay if needed
+    ctx.globalCompositeOperation = 'source-over';
+    
+    // Draw ambient overlay to match UI
+    if (activeBg.ambientColor) {
+      ctx.globalCompositeOperation = 'overlay';
+      ctx.fillStyle = activeBg.ambientColor;
+      // Undo mirror just for overlay drawing if mirrored
+      if (facingMode === 'user') {
+        ctx.scale(-1, 1);
+        ctx.translate(-canvas.width, 0);
+      }
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
     return canvas.toDataURL('image/jpeg', 0.92);
   }, [facingMode]);
 

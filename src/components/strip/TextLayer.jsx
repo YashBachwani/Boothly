@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBooth } from '../../context/BoothContext';
-import { STICKERS, STICKER_CATEGORIES } from '../../constants';
+import { FONTS, FONT_CATEGORIES } from '../../constants';
 
 // Sub-component for premium drag, resize, rotate, and touch interaction
-function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSelectedId, bringForward, sendBackward, removeSticker, duplicateSticker }) {
+function DraggableText({ tLayer, isSelected, layerRef, updateText, setSelectedId, setShowEditor, bringForward, sendBackward, removeText, duplicateText, textStyle }) {
   const elementRef = useRef(null);
   const pointerTracker = useRef({
     type: null, // 'drag' | 'resize' | 'rotate'
@@ -25,10 +25,11 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
   const [showSnapX, setShowSnapX] = useState(false);
   const [showSnapY, setShowSnapY] = useState(false);
 
-  // Handle pointer down on the sticker (Drag/Select/Multi-touch)
+  // Handle pointer down on the text (Drag/Select/Multi-touch)
   const handlePointerDown = (e) => {
     e.stopPropagation();
-    setSelectedId(sticker.id);
+    setSelectedId(tLayer.id);
+    setShowEditor(true);
 
     // Save active pointer for multi-touch detection
     pointerTracker.current.pointers[e.pointerId] = { clientX: e.clientX, clientY: e.clientY };
@@ -40,8 +41,8 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
       pointerTracker.current.type = 'pinch';
       pointerTracker.current.initDist = Math.hypot(p2.clientX - p1.clientX, p2.clientY - p1.clientY);
       pointerTracker.current.initAngle = Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * (180 / Math.PI);
-      pointerTracker.current.initScale = sticker.scale || 1;
-      pointerTracker.current.initRotate = sticker.rotate || 0;
+      pointerTracker.current.initScale = tLayer.scale || 1;
+      pointerTracker.current.initRotate = tLayer.rotate || 0;
       elementRef.current.setPointerCapture(e.pointerId);
       return;
     }
@@ -54,8 +55,8 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
     pointerTracker.current.type = 'drag';
     pointerTracker.current.startX = e.clientX;
     pointerTracker.current.startY = e.clientY;
-    pointerTracker.current.initX = sticker.x;
-    pointerTracker.current.initY = sticker.y;
+    pointerTracker.current.initX = tLayer.x;
+    pointerTracker.current.initY = tLayer.y;
 
     elementRef.current.setPointerCapture(e.pointerId);
   };
@@ -81,7 +82,7 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
         const scaleFactor = currentDist / tracker.initDist;
         const angleDiff = currentAngle - tracker.initAngle;
 
-        updateSticker(sticker.id, {
+        updateText(tLayer.id, {
           scale: Math.max(0.2, Math.min(4, tracker.initScale * scaleFactor)),
           rotate: (tracker.initRotate + angleDiff) % 360,
         });
@@ -114,15 +115,15 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
       setShowSnapX(snapX);
       setShowSnapY(snapY);
 
-      updateSticker(sticker.id, { x: newX, y: newY });
+      updateText(tLayer.id, { x: newX, y: newY });
     } else if (tracker.type === 'resize') {
       const currentDist = Math.hypot(e.clientX - tracker.centerX, e.clientY - tracker.centerY);
       const newScale = Math.max(0.2, Math.min(4, tracker.initScale * (currentDist / tracker.initDist)));
-      updateSticker(sticker.id, { scale: newScale });
+      updateText(tLayer.id, { scale: newScale });
     } else if (tracker.type === 'rotate') {
       const currentAngle = Math.atan2(e.clientY - tracker.centerY, e.clientX - tracker.centerX) * (180 / Math.PI);
       const angleDiff = currentAngle - tracker.initAngle;
-      updateSticker(sticker.id, { rotate: (tracker.initRotate + angleDiff) % 360 });
+      updateText(tLayer.id, { rotate: (tracker.initRotate + angleDiff) % 360 });
     }
   };
 
@@ -162,7 +163,7 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
       centerX,
       centerY,
       initDist: Math.hypot(e.clientX - centerX, e.clientY - centerY),
-      initScale: sticker.scale || 1,
+      initScale: tLayer.scale || 1,
     };
   };
 
@@ -182,7 +183,7 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
       centerX,
       centerY,
       initAngle: Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI),
-      initRotate: sticker.rotate || 0,
+      initRotate: tLayer.rotate || 0,
     };
   };
 
@@ -214,24 +215,25 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
         onMouseLeave={() => setIsHovered(false)}
         style={{
           position: 'absolute',
-          top: `${sticker.y}%`,
-          left: `${sticker.x}%`,
-          fontSize: '48px',
+          top: `${tLayer.y}%`,
+          left: `${tLayer.x}%`,
+          fontSize: '32px',
           pointerEvents: 'auto',
           cursor: pointerTracker.current.type === 'drag' ? 'grabbing' : 'grab',
           userSelect: 'none',
           touchAction: 'none',
-          lineHeight: 1,
-          zIndex: isSelected ? 999 : sticker.zIndex || 0,
-          transform: `translate(-50%, -50%) scale(${sticker.scale || 1}) rotate(${sticker.rotate || 0}deg) scaleX(${sticker.flipX ? -1 : 1})`,
-          opacity: sticker.opacity !== undefined ? sticker.opacity : 1,
+          lineHeight: 1.2,
+          zIndex: isSelected ? 999 : tLayer.zIndex || 0,
+          transform: `translate(-50%, -50%) scale(${tLayer.scale || 1}) rotate(${tLayer.rotate || 0}deg)`,
+          opacity: tLayer.opacity !== undefined ? tLayer.opacity : 1,
           padding: '8px',
           transition: pointerTracker.current.type ? 'none' : 'transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1)',
+          ...textStyle
         }}
       >
-        {/* Render Sticker Content */}
+        {/* Render Text Content */}
         <div style={{ pointerEvents: 'none' }}>
-          {sticker.emoji}
+          {tLayer.text}
         </div>
 
         {/* Bounding Box Outline (Selected or Hovered State) */}
@@ -263,13 +265,13 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
 
             {/* Premium Interactive Action Floating Toolbar */}
             <div
-              className="sticker-toolbar glass-card"
+              className="text-toolbar glass-card"
               onPointerDown={(e) => e.stopPropagation()}
               style={{
                 position: 'absolute',
                 top: 'calc(100% + 16px)',
                 left: '50%',
-                transform: 'translateX(-50%) scale(calc(1 / var(--sticker-scale, 1)))',
+                transform: 'translateX(-50%) scale(calc(1 / var(--text-scale, 1)))',
                 transformOrigin: 'top center',
                 display: 'flex',
                 gap: '8px',
@@ -282,14 +284,12 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
                 pointerEvents: 'auto',
               }}
             >
-              <button className="icon-btn control-btn" title="Flip Horizontal" onPointerDown={() => updateSticker(sticker.id, { flipX: !sticker.flipX })}>↔️</button>
-              <button className="icon-btn control-btn" title="Opacity" onPointerDown={() => updateSticker(sticker.id, { opacity: Math.max(0.2, (sticker.opacity !== undefined ? sticker.opacity : 1) - 0.2 < 0.1 ? 1 : (sticker.opacity !== undefined ? sticker.opacity : 1) - 0.2) })}>👻</button>
-              <button className="icon-btn control-btn" title="Layer Up" onPointerDown={() => bringForward(sticker.id)}>⬆️</button>
-              <button className="icon-btn control-btn" title="Layer Down" onPointerDown={() => sendBackward(sticker.id)}>⬇️</button>
-              <button className="icon-btn control-btn" title="Duplicate" onPointerDown={() => duplicateSticker(sticker.id)}>👯</button>
-              <button className="icon-btn control-btn" title="Delete" onPointerDown={() => removeSticker(sticker.id)}>🗑️</button>
+              <button className="icon-btn control-btn" title="Layer Up" onPointerDown={() => bringForward(tLayer.id)}>⬆️</button>
+              <button className="icon-btn control-btn" title="Layer Down" onPointerDown={() => sendBackward(tLayer.id)}>⬇️</button>
+              <button className="icon-btn control-btn" title="Duplicate" onPointerDown={() => duplicateText(tLayer.id)}>👯</button>
+              <button className="icon-btn control-btn" title="Delete" onPointerDown={() => removeText(tLayer.id)}>🗑️</button>
               <div style={{ width: '1px', background: 'var(--border-subtle)', margin: '0 4px' }} />
-              <button className="icon-btn control-btn active" title="Deselect" onPointerDown={() => setSelectedId(null)}>✔️</button>
+              <button className="icon-btn control-btn active" title="Deselect" onPointerDown={() => { setSelectedId(null); setShowEditor(false); }}>✔️</button>
             </div>
           </>
         )}
@@ -344,7 +344,7 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
         .rotate-handle:active {
           cursor: grabbing;
         }
-        .sticker-toolbar {
+        .text-toolbar {
           background: var(--bg-card);
           backdrop-filter: blur(10px);
         }
@@ -353,10 +353,9 @@ function DraggableSticker({ sticker, isSelected, layerRef, updateSticker, setSel
   );
 }
 
-export default function StickerLayer({ readOnly = false }) {
-  const { stickers, setStickers } = useBooth();
-  const [activeCategory, setActiveCategory] = useState(STICKER_CATEGORIES[0]);
-  const [showPicker, setShowPicker] = useState(false);
+export default function TextLayer({ readOnly = false }) {
+  const { textLayers, setTextLayers } = useBooth();
+  const [showEditor, setShowEditor] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const layerRef = useRef(null);
 
@@ -365,8 +364,9 @@ export default function StickerLayer({ readOnly = false }) {
     if (readOnly) return;
     const handleGlobalClick = (e) => {
       if (layerRef.current && layerRef.current.contains(e.target)) {
-        if (e.target.id === 'sticker-layer') {
+        if (e.target.id === 'text-layer') {
           setSelectedId(null);
+          setShowEditor(false);
         }
       }
     };
@@ -374,96 +374,120 @@ export default function StickerLayer({ readOnly = false }) {
     return () => window.removeEventListener('pointerdown', handleGlobalClick);
   }, [readOnly]);
 
-  const addSticker = (emoji) => {
-    setStickers([...stickers, { 
-      id: Date.now(), emoji, 
-      x: 50, y: 50, 
-      scale: 1, rotate: 0, 
-      opacity: 1, flipX: false, zIndex: stickers.length 
-    }]);
-    setShowPicker(false);
+  const addTextLayer = () => {
+    const newLayer = {
+      id: Date.now(),
+      text: 'New Text',
+      x: 50, y: 50,
+      scale: 1, rotate: 0,
+      opacity: 1,
+      color: '#ffffff',
+      font: FONTS[0].family,
+      shadow: false,
+      outline: false,
+      zIndex: textLayers.length
+    };
+    setTextLayers([...textLayers, newLayer]);
+    setSelectedId(newLayer.id);
+    setShowEditor(true);
   };
 
-  const updateSticker = (id, newProps) => {
-    setStickers(stickers.map(s => s.id === id ? { ...s, ...newProps } : s));
+  const updateText = (id, newProps) => {
+    setTextLayers(textLayers.map(t => t.id === id ? { ...t, ...newProps } : t));
   };
 
-  const removeSticker = (id) => {
-    setStickers(stickers.filter(s => s.id !== id));
-    if (selectedId === id) setSelectedId(null);
+  const removeText = (id) => {
+    setTextLayers(textLayers.filter(t => t.id !== id));
+    if (selectedId === id) {
+      setSelectedId(null);
+      setShowEditor(false);
+    }
   };
 
-  const duplicateSticker = (id) => {
-    const original = stickers.find(s => s.id === id);
+  const duplicateText = (id) => {
+    const original = textLayers.find(t => t.id === id);
     if (!original) return;
     const copy = {
       ...original,
       id: Date.now() + Math.random(),
       x: Math.min(90, original.x + 5),
       y: Math.min(90, original.y + 5),
-      zIndex: stickers.length
+      zIndex: textLayers.length
     };
-    setStickers([...stickers, copy]);
+    setTextLayers([...textLayers, copy]);
     setSelectedId(copy.id);
+    setShowEditor(true);
   };
 
   const bringForward = (id) => {
-    const s = stickers.find(s => s.id === id);
-    if (s) updateSticker(id, { zIndex: s.zIndex + 1 });
+    const t = textLayers.find(x => x.id === id);
+    if (t) updateText(id, { zIndex: t.zIndex + 1 });
   };
 
   const sendBackward = (id) => {
-    const s = stickers.find(s => s.id === id);
-    if (s && s.zIndex > 0) updateSticker(id, { zIndex: s.zIndex - 1 });
+    const t = textLayers.find(x => x.id === id);
+    if (t && t.zIndex > 0) updateText(id, { zIndex: t.zIndex - 1 });
   };
+
+  const activeText = textLayers.find(t => t.id === selectedId);
 
   return (
     <>
       <div
-        id="sticker-layer"
+        id="text-layer"
         ref={layerRef}
         style={{
           position: 'absolute', inset: 0,
           pointerEvents: 'none',
           overflow: 'hidden',
-          zIndex: 10,
+          zIndex: 15,
         }}
       >
-        {stickers.slice().sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0)).map((sticker) => {
+        {textLayers.slice().sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0)).map((tLayer) => {
+          const isSelected = selectedId === tLayer.id;
+
+          const textStyle = {
+            fontFamily: tLayer.font,
+            color: tLayer.color,
+            textShadow: tLayer.shadow ? '0 2px 10px rgba(0,0,0,0.5)' : (tLayer.outline ? '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' : 'none'),
+            opacity: tLayer.opacity !== undefined ? tLayer.opacity : 1,
+            whiteSpace: 'nowrap',
+          };
+
           if (readOnly) {
             return (
               <div
-                key={sticker.id}
+                key={tLayer.id}
                 style={{
                   position: 'absolute',
-                  top: `${sticker.y}%`, left: `${sticker.x}%`,
-                  fontSize: '48px',
-                  lineHeight: 1,
+                  top: `${tLayer.y}%`, left: `${tLayer.x}%`,
+                  fontSize: '32px',
+                  lineHeight: 1.2,
                   userSelect: 'none',
-                  transform: `translate(-50%, -50%) scale(${sticker.scale || 1}) rotate(${sticker.rotate || 0}deg) scaleX(${sticker.flipX ? -1 : 1})`,
-                  opacity: sticker.opacity !== undefined ? sticker.opacity : 1,
-                  zIndex: sticker.zIndex || 0
+                  transform: `translate(-50%, -50%) scale(${tLayer.scale || 1}) rotate(${tLayer.rotate || 0}deg)`,
+                  zIndex: tLayer.zIndex || 0,
+                  ...textStyle
                 }}
               >
-                {sticker.emoji}
+                {tLayer.text}
               </div>
             );
           }
 
-          const isSelected = selectedId === sticker.id;
-
           return (
-            <DraggableSticker
-              key={sticker.id}
-              sticker={sticker}
+            <DraggableText
+              key={tLayer.id}
+              tLayer={tLayer}
               isSelected={isSelected}
               layerRef={layerRef}
-              updateSticker={updateSticker}
+              updateText={updateText}
               setSelectedId={setSelectedId}
+              setShowEditor={setShowEditor}
               bringForward={bringForward}
               sendBackward={sendBackward}
-              removeSticker={removeSticker}
-              duplicateSticker={duplicateSticker}
+              removeText={removeText}
+              duplicateText={duplicateText}
+              textStyle={textStyle}
             />
           );
         })}
@@ -472,9 +496,12 @@ export default function StickerLayer({ readOnly = false }) {
       {!readOnly && (
         <motion.button
           className="btn btn-primary"
-          onClick={() => setShowPicker(!showPicker)}
+          onClick={() => {
+            if (!activeText) addTextLayer();
+            else setShowEditor(!showEditor);
+          }}
           style={{
-            position: 'absolute', bottom: '16px', right: '16px',
+            position: 'absolute', bottom: '16px', right: '76px',
             width: '50px', height: '50px', borderRadius: '50%',
             padding: 0, fontSize: '24px',
             zIndex: 20, boxShadow: 'var(--shadow-lg)',
@@ -482,73 +509,69 @@ export default function StickerLayer({ readOnly = false }) {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
-          ✨
+          T
         </motion.button>
       )}
 
-      {!readOnly && (
+      {!readOnly && activeText && showEditor && (
         <AnimatePresence>
-          {showPicker && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="glass-card"
-              style={{
-                position: 'absolute', bottom: '80px', right: '16px',
-                width: '280px', padding: '16px', zIndex: 20,
-                display: 'flex', flexDirection: 'column', gap: '12px',
-              }}
-            >
-              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }} className="hide-scrollbar">
-                {STICKER_CATEGORIES.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    style={{
-                      padding: '6px 12px', borderRadius: '16px',
-                      background: activeCategory === cat ? 'var(--accent-pink)' : 'var(--bg-glass)',
-                      color: activeCategory === cat ? '#fff' : 'var(--text-primary)',
-                      border: 'none', fontSize: '0.8rem', cursor: 'pointer', textTransform: 'capitalize',
-                    }}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="glass-card"
+            style={{
+              position: 'absolute', bottom: '80px', right: '16px',
+              width: '300px', padding: '16px', zIndex: 20,
+              display: 'flex', flexDirection: 'column', gap: '12px',
+            }}
+          >
+            <input
+              type="text"
+              value={activeText.text}
+              onChange={(e) => updateText(activeText.id, { text: e.target.value })}
+              style={{ padding: '8px', borderRadius: '8px', border: '1px solid var(--border-subtle)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', width: '100%' }}
+              placeholder="Enter text..."
+            />
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              <input type="color" value={activeText.color} onChange={(e) => updateText(activeText.id, { color: e.target.value })} style={{ width: '32px', height: '32px', cursor: 'pointer', padding: 0, border: 'none', borderRadius: '4px' }} />
+              <button className="btn btn-ghost btn-sm" onClick={() => updateText(activeText.id, { shadow: !activeText.shadow })} style={{ background: activeText.shadow ? 'var(--bg-glass)' : 'transparent' }}>Shadow</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => updateText(activeText.id, { outline: !activeText.outline })} style={{ background: activeText.outline ? 'var(--bg-glass)' : 'transparent' }}>Outline</button>
+            </div>
 
-              <div style={{
-                display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
-                gap: '8px', maxHeight: '160px', overflowY: 'auto',
-                padding: '4px',
-              }} className="hide-scrollbar">
-                {STICKERS.filter(s => s.category === activeCategory).map(s => (
-                  <motion.button
-                    key={s.id}
-                    onClick={() => addSticker(s.emoji)}
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                    style={{
-                      background: 'transparent', border: 'none',
-                      fontSize: '28px', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}
-                  >
-                    {s.emoji}
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Opacity</span>
+              <input type="range" min="0.1" max="1" step="0.1" value={activeText.opacity !== undefined ? activeText.opacity : 1} onChange={(e) => updateText(activeText.id, { opacity: parseFloat(e.target.value) })} style={{ flex: 1, accentColor: 'var(--accent-pink)' }} />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '150px', overflowY: 'auto' }} className="hide-scrollbar">
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Fonts</span>
+              {FONT_CATEGORIES.map(cat => (
+                <div key={cat}>
+                  <div style={{ fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)', marginTop: '4px' }}>{cat}</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                    {FONTS.filter(f => f.category === cat).map(f => (
+                      <button
+                        key={f.id}
+                        onClick={() => updateText(activeText.id, { font: f.family })}
+                        style={{
+                          padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-subtle)',
+                          background: activeText.font === f.family ? 'var(--accent-pink)' : 'var(--bg-secondary)',
+                          color: activeText.font === f.family ? '#fff' : 'var(--text-primary)',
+                          fontFamily: f.family, fontSize: '14px', cursor: 'pointer'
+                        }}
+                      >
+                        {f.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </AnimatePresence>
       )}
-      <style dangerouslySetInnerHTML={{__html:`
-        .icon-btn {
-          background: transparent; border: none; font-size: 14px; cursor: pointer; padding: 2px;
-          border-radius: 4px; display: flex; align-items: center; justify-content: center;
-        }
-        .icon-btn:hover { background: rgba(255,255,255,0.1); }
-      `}} />
     </>
   );
 }

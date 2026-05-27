@@ -3,10 +3,9 @@ import { motion } from 'framer-motion';
 import html2canvas from 'html2canvas';
 import { useBooth } from '../../context/BoothContext';
 import StripCanvas from './StripCanvas';
-import StickerLayer from './StickerLayer';
 
 export default function DownloadShare() {
-  const { newSession, setStep, stickers } = useBooth();
+  const { newSession, setStep } = useBooth();
   const [isExporting, setIsExporting] = useState(false);
   const compositeRef = useRef(null);
 
@@ -90,11 +89,8 @@ export default function DownloadShare() {
             display: 'inline-block', // shrink to fit children
           }}
         >
-          {/* Base strip generated via canvas API */}
-          <StripCanvas />
-          
-          {/* Read-only stickers overlay */}
-          <StickerLayer readOnly />
+          {/* Base strip with read-only layers inside */}
+          <StripCanvas readOnly />
         </div>
 
         {isExporting && (
