@@ -1,6 +1,55 @@
-// Extended sticker library with 12 categories
-
+// Extended sticker library with 15 categories including a massive Daily pack
 export const EXTENDED_STICKERS = [
+  // ── Daily Emojis (Most commonly used on phones daily) ───
+  { id: 'dy1', emoji: '😂', category: 'daily' },
+  { id: 'dy2', emoji: '😭', category: 'daily' },
+  { id: 'dy3', emoji: '🥺', category: 'daily' },
+  { id: 'dy4', emoji: '🔥', category: 'daily' },
+  { id: 'dy5', emoji: '💀', category: 'daily' },
+  { id: 'dy6', emoji: '🤣', category: 'daily' },
+  { id: 'dy7', emoji: '👍', category: 'daily' },
+  { id: 'dy8', emoji: '🙏', category: 'daily' },
+  { id: 'dy9', emoji: '❤️', category: 'daily' },
+  { id: 'dy10', emoji: '✨', category: 'daily' },
+  { id: 'dy11', emoji: '👀', category: 'daily' },
+  { id: 'dy12', emoji: '🥰', category: 'daily' },
+  { id: 'dy13', emoji: '😍', category: 'daily' },
+  { id: 'dy14', emoji: '😊', category: 'daily' },
+  { id: 'dy15', emoji: '🤔', category: 'daily' },
+  { id: 'dy16', emoji: '😉', category: 'daily' },
+  { id: 'dy17', emoji: '🥳', category: 'daily' },
+  { id: 'dy18', emoji: '😎', category: 'daily' },
+  { id: 'dy19', emoji: '🤩', category: 'daily' },
+  { id: 'dy20', emoji: '🙄', category: 'daily' },
+  { id: 'dy21', emoji: '😴', category: 'daily' },
+  { id: 'dy22', emoji: '🥵', category: 'daily' },
+  { id: 'dy23', emoji: '🥶', category: 'daily' },
+  { id: 'dy24', emoji: '🤡', category: 'daily' },
+  { id: 'dy25', emoji: '💩', category: 'daily' },
+  { id: 'dy26', emoji: '💯', category: 'daily' },
+  { id: 'dy27', emoji: '🎉', category: 'daily' },
+  { id: 'dy28', emoji: '🎈', category: 'daily' },
+  { id: 'dy29', emoji: '⚡', category: 'daily' },
+  { id: 'dy30', emoji: '🌈', category: 'daily' },
+  { id: 'dy31', emoji: '🍕', category: 'daily' },
+  { id: 'dy32', emoji: '🍔', category: 'daily' },
+  { id: 'dy33', emoji: '🍟', category: 'daily' },
+  { id: 'dy34', emoji: '☕', category: 'daily' },
+  { id: 'dy35', emoji: '🍻', category: 'daily' },
+  { id: 'dy36', emoji: '🐱', category: 'daily' },
+  { id: 'dy37', emoji: '🐶', category: 'daily' },
+  { id: 'dy38', emoji: '🦄', category: 'daily' },
+  { id: 'dy39', emoji: '🧸', category: 'daily' },
+  { id: 'dy40', emoji: '🎀', category: 'daily' },
+  { id: 'dy41', emoji: '💸', category: 'daily' },
+  { id: 'dy42', emoji: '✈️', category: 'daily' },
+  { id: 'dy43', emoji: '🌍', category: 'daily' },
+  { id: 'dy44', emoji: '🌞', category: 'daily' },
+  { id: 'dy45', emoji: '🌙', category: 'daily' },
+  { id: 'dy46', emoji: '🌧️', category: 'daily' },
+  { id: 'dy47', emoji: '❄️', category: 'daily' },
+  { id: 'dy48', emoji: '🍀', category: 'daily' },
+
   // ── Hearts ──────────────────────────────────────────────
   { id: 'h1', emoji: '❤️', category: 'hearts' },
   { id: 'h2', emoji: '🩷', category: 'hearts' },
@@ -24,14 +73,14 @@ export const EXTENDED_STICKERS = [
   { id: 's8', emoji: '⚡', category: 'stars' },
 
   // ── Flowers ─────────────────────────────────────────────
-  { id: 'f1', emoji: '🌸', category: 'flowers' },
-  { id: 'f2', emoji: '🌷', category: 'flowers' },
-  { id: 'f3', emoji: '🌻', category: 'flowers' },
-  { id: 'f4', emoji: '🌹', category: 'flowers' },
-  { id: 'f5', emoji: '🌼', category: 'flowers' },
-  { id: 'f6', emoji: '🪷', category: 'flowers' },
-  { id: 'f7', emoji: '🌺', category: 'flowers' },
-  { id: 'f8', emoji: '🍀', category: 'flowers' },
+  { id: 'fl1', emoji: '🌸', category: 'flowers' },
+  { id: 'fl2', emoji: '🌷', category: 'flowers' },
+  { id: 'fl3', emoji: '🌻', category: 'flowers' },
+  { id: 'fl4', emoji: '🌹', category: 'flowers' },
+  { id: 'fl5', emoji: '🌼', category: 'flowers' },
+  { id: 'fl6', emoji: '🪷', category: 'flowers' },
+  { id: 'fl7', emoji: '🌺', category: 'flowers' },
+  { id: 'fl8', emoji: '🍀', category: 'flowers' },
 
   // ── Sparkles ────────────────────────────────────────────
   { id: 'sp1', emoji: '🎆', category: 'sparkles' },
@@ -74,6 +123,8 @@ export const EXTENDED_STICKERS = [
   { id: 'g6', emoji: '🤪', category: 'sunglasses' },
   { id: 'g7', emoji: '😏', category: 'sunglasses' },
   { id: 'g8', emoji: '🫦', category: 'sunglasses' },
+  { id: 'g9', emoji: '😍', category: 'sunglasses' },
+  { id: 'g10', emoji: '😭', category: 'sunglasses' },
 
   // ── Tape / Aesthetic ────────────────────────────────────
   { id: 't1', emoji: '📌', category: 'tape' },
@@ -91,9 +142,8 @@ export const EXTENDED_STICKERS = [
   { id: 'b3', emoji: '🎊', category: 'birthday' },
   { id: 'b4', emoji: '🎁', category: 'birthday' },
   { id: 'b5', emoji: '🎈', category: 'birthday' },
-  { id: 'b6', emoji: '🎀', category: 'birthday' },
-  { id: 'b7', emoji: '🪅', category: 'birthday' },
-  { id: 'b8', emoji: '🍾', category: 'birthday' },
+  { id: 'b6', emoji: '🪅', category: 'birthday' },
+  { id: 'b7', emoji: '🍾', category: 'birthday' },
 
   // ── Wedding ─────────────────────────────────────────────
   { id: 'w1', emoji: '💍', category: 'wedding' },
@@ -103,7 +153,6 @@ export const EXTENDED_STICKERS = [
   { id: 'w5', emoji: '🎩', category: 'wedding' },
   { id: 'w6', emoji: '💒', category: 'wedding' },
   { id: 'w7', emoji: '🌹', category: 'wedding' },
-  { id: 'w8', emoji: '✨', category: 'wedding' },
 
   // ── Festival ────────────────────────────────────────────
   { id: 'fes1', emoji: '🪔', category: 'festival' },
@@ -112,21 +161,43 @@ export const EXTENDED_STICKERS = [
   { id: 'fes4', emoji: '🎑', category: 'festival' },
   { id: 'fes5', emoji: '🎍', category: 'festival' },
   { id: 'fes6', emoji: '🎏', category: 'festival' },
-  { id: 'fes7', emoji: '🎐', category: 'festival' },
-  { id: 'fes8', emoji: '🧧', category: 'festival' },
+  { id: 'fes7', emoji: '🧧', category: 'festival' },
 
   // ── Anime ───────────────────────────────────────────────
   { id: 'a1', emoji: '⛩️', category: 'anime' },
   { id: 'a2', emoji: '🍜', category: 'anime' },
-  { id: 'a3', emoji: '🌸', category: 'anime' },
-  { id: 'a4', emoji: '🗾', category: 'anime' },
-  { id: 'a5', emoji: '🧿', category: 'anime' },
-  { id: 'a6', emoji: '🏮', category: 'anime' },
-  { id: 'a7', emoji: '🌙', category: 'anime' },
-  { id: 'a8', emoji: '⚔️', category: 'anime' },
+  { id: 'a3', emoji: '🗾', category: 'anime' },
+  { id: 'a4', emoji: '🧿', category: 'anime' },
+  { id: 'a5', emoji: '🏮', category: 'anime' },
+  { id: 'a6', emoji: '⚔️', category: 'anime' },
+
+  // ── Food & Drink ────────────────────────────────────────
+  { id: 'fd1', emoji: '🍎', category: 'food' },
+  { id: 'fd2', emoji: '🍓', category: 'food' },
+  { id: 'fd3', emoji: '🍑', category: 'food' },
+  { id: 'fd4', emoji: '🍋', category: 'food' },
+  { id: 'fd5', emoji: '🍒', category: 'food' },
+  { id: 'fd6', emoji: '🍟', category: 'food' },
+  { id: 'fd7', emoji: '🍕', category: 'food' },
+  { id: 'fd8', emoji: '🍩', category: 'food' },
+  { id: 'fd9', emoji: '🧁', category: 'food' },
+  { id: 'fd10', emoji: '🧋', category: 'food' },
+
+  // ── Animals ──────────────────────────────────────────────
+  { id: 'an1', emoji: '🐱', category: 'animals' },
+  { id: 'an2', emoji: '🐶', category: 'animals' },
+  { id: 'an3', emoji: '🐰', category: 'animals' },
+  { id: 'an4', emoji: '🦊', category: 'animals' },
+  { id: 'an5', emoji: '🐻', category: 'animals' },
+  { id: 'an6', emoji: '🐼', category: 'animals' },
+  { id: 'an7', emoji: '🐨', category: 'animals' },
+  { id: 'an8', emoji: '🦁', category: 'animals' },
+  { id: 'an9', emoji: '🐹', category: 'animals' },
+  { id: 'an10', emoji: '🐣', category: 'animals' },
 ];
 
 export const EXTENDED_STICKER_CATEGORIES = [
+  { id: 'daily',      label: 'Daily',      icon: '📱' },
   { id: 'hearts',     label: 'Hearts',     icon: '❤️' },
   { id: 'stars',      label: 'Stars',      icon: '⭐' },
   { id: 'flowers',    label: 'Flowers',    icon: '🌸' },
@@ -139,4 +210,6 @@ export const EXTENDED_STICKER_CATEGORIES = [
   { id: 'wedding',    label: 'Wedding',    icon: '💍' },
   { id: 'festival',   label: 'Festival',   icon: '🪔' },
   { id: 'anime',      label: 'Anime',      icon: '⛩️' },
+  { id: 'food',       label: 'Food',       icon: '🍕' },
+  { id: 'animals',    label: 'Animals',    icon: '🐱' },
 ];

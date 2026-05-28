@@ -6,6 +6,7 @@ const initialState = {
   step: 'landing', // 'landing' | 'entry' | 'select' | 'camera' | 'print' | 'customize' | 'result'
   photoCount: 4,
   photos: [],
+  originalPhotos: [],
   currentFilter: 'normal',
   stripLayout: 'vertical',
   stripTheme: 'minimal',
@@ -27,8 +28,10 @@ function boothReducer(state, action) {
   switch (action.type) {
     case 'SET_STEP': return { ...state, step: action.payload };
     case 'SET_PHOTO_COUNT': return { ...state, photoCount: action.payload };
-    case 'ADD_PHOTO': return { ...state, photos: [...state.photos, action.payload] };
+    case 'ADD_PHOTO': return { ...state, photos: [...state.photos, action.payload], originalPhotos: [...state.originalPhotos, action.payload] };
+    case 'ADD_PHOTO_DUAL': return { ...state, photos: [...state.photos, action.payload.enhanced], originalPhotos: [...state.originalPhotos, action.payload.raw] };
     case 'SET_PHOTOS': return { ...state, photos: action.payload };
+    case 'SET_ORIGINAL_PHOTOS': return { ...state, originalPhotos: action.payload };
     case 'SET_FILTER': return { ...state, currentFilter: action.payload };
     case 'SET_LAYOUT': return { ...state, stripLayout: action.payload };
     case 'SET_THEME': return { ...state, stripTheme: action.payload };
@@ -57,7 +60,9 @@ export function BoothProvider({ children }) {
   const setStep = (step) => dispatch({ type: 'SET_STEP', payload: step });
   const setPhotoCount = (count) => dispatch({ type: 'SET_PHOTO_COUNT', payload: count });
   const addPhoto = (photo) => dispatch({ type: 'ADD_PHOTO', payload: photo });
+  const addPhotoDual = (raw, enhanced) => dispatch({ type: 'ADD_PHOTO_DUAL', payload: { raw, enhanced } });
   const setPhotos = (photos) => dispatch({ type: 'SET_PHOTOS', payload: photos });
+  const setOriginalPhotos = (photos) => dispatch({ type: 'SET_ORIGINAL_PHOTOS', payload: photos });
   const setFilter = (filter) => dispatch({ type: 'SET_FILTER', payload: filter });
   const setLayout = (layout) => dispatch({ type: 'SET_LAYOUT', payload: layout });
   const setTheme = (theme) => dispatch({ type: 'SET_THEME', payload: theme });
@@ -80,7 +85,7 @@ export function BoothProvider({ children }) {
   return (
     <BoothContext.Provider value={{
       ...state,
-      setStep, setPhotoCount, addPhoto, setPhotos,
+      setStep, setPhotoCount, addPhoto, addPhotoDual, setPhotos, setOriginalPhotos,
       setFilter, setLayout, setTheme, addSticker,
       setStickers, setTextLayers, setCustomText, setFrame,
       resetSession, newSession,

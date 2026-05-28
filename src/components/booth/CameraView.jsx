@@ -10,9 +10,14 @@ import AIEnhancementPanel from './AIEnhancementPanel';
 import VirtualBackgroundPanel from './VirtualBackgroundPanel';
 import MusicPlayer from './MusicPlayer';
 import { VIRTUAL_BACKGROUNDS } from '../../constants/backgrounds';
+import { generateEnhancedPreview } from '../../utils/imageEnhancement';
 
 export default function CameraView() {
-  const { photoCount, currentFilter, addPhoto, setStep, currentBackground, setCurrentBackground, currentMusic, setCurrentMusic, isMuted, setIsMuted } = useBooth();
+  const { 
+    photoCount, currentFilter, addPhoto, addPhotoDual, setStep, 
+    currentBackground, setCurrentBackground, currentMusic, setCurrentMusic, 
+    isMuted, setIsMuted, enhancements, enhancementIntensity, enhancementsEnabled 
+  } = useBooth();
   const { videoRef, isReady, error, startCamera, flipCamera, hasMultipleCameras, capturePhoto } = useCamera();
   const { count, isRunning, isFlashing, runSession } = useCountdown();
   const { playShutter, playCountdownBeep, playBackgroundMusic, setMuted } = useAudio();
@@ -49,8 +54,17 @@ export default function CameraView() {
         playShutter();
         return capturePhoto(currentFilter, currentBackground);
       },
-      (photo, numTaken) => {
-        addPhoto(photo);
+      async (photo, numTaken) => {
+        let finalPhoto = photo;
+        if (enhancementsEnabled && Object.values(enhancements).some(Boolean)) {
+          try {
+            const { enhanced } = await generateEnhancedPreview(photo, enhancements, enhancementIntensity);
+            finalPhoto = enhanced;
+          } catch (e) {
+            console.warn('AI enhancement on capture failed:', e);
+          }
+        }
+        addPhotoDual(photo, finalPhoto);
         setPhotosTaken(numTaken);
       },
       () => {
@@ -219,12 +233,14 @@ export default function CameraView() {
       </div>
 
       {/* Controls / Filters */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 10 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '8px' }}>
-          <div style={{ flex: 1, overflowX: 'auto', paddingBottom: '4px' }}>
+      <div className="camera-controls-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 10 }}>
+        <div className="camera-controls-flex-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '8px' }}>
+          <div style={{ flex: 1, overflowX: 'auto', paddingBottom: '4px' }} className="hide-scrollbar">
             <FilterPanel disabled={isRunning} />
           </div>
-          <AIEnhancementPanel />
+          <div className="camera-ai-btn" style={{ flexShrink: 0 }}>
+            <AIEnhancementPanel />
+          </div>
         </div>
         
         {!isRunning && (
@@ -241,6 +257,29 @@ export default function CameraView() {
           </div>
         )}
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 600px) {
+          .camera-controls-flex-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+          }
+          .camera-ai-btn {
+            display: flex !important;
+            justify-content: center !important;
+            width: 100% !important;
+          }
+          .camera-ai-btn > div {
+            width: 100% !important;
+          }
+          .camera-ai-btn button {
+            width: 100% !important;
+            padding: 12px !important;
+            justify-content: center !important;
+          }
+        }
+      `}} />
     </div>
   );
 }

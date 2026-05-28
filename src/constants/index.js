@@ -149,61 +149,9 @@ export const STRIP_THEMES = [
   },
 ];
 
-export const STICKERS = [
-  // Hearts
-  { id: 's1', emoji: '❤️', category: 'hearts' },
-  { id: 's2', emoji: '🩷', category: 'hearts' },
-  { id: 's3', emoji: '💜', category: 'hearts' },
-  { id: 's4', emoji: '💙', category: 'hearts' },
-  { id: 's5', emoji: '🤍', category: 'hearts' },
-  { id: 's6', emoji: '💕', category: 'hearts' },
-  // Stars & Sparkles
-  { id: 's7', emoji: '⭐', category: 'stars' },
-  { id: 's8', emoji: '✨', category: 'stars' },
-  { id: 's9', emoji: '🌟', category: 'stars' },
-  { id: 's10', emoji: '💫', category: 'stars' },
-  { id: 's11', emoji: '🌙', category: 'stars' },
-  // Emoji & Face
-  { id: 's23', emoji: '😊', category: 'emoji' },
-  { id: 's24', emoji: '🥰', category: 'emoji' },
-  { id: 's25', emoji: '😎', category: 'emoji' },
-  { id: 's26', emoji: '🤩', category: 'emoji' },
-  { id: 's27', emoji: '😈', category: 'emoji' },
-  // Kawaii Doodles
-  { id: 'k1', emoji: '🎀', category: 'kawaii' },
-  { id: 'k2', emoji: '🌸', category: 'kawaii' },
-  { id: 'k3', emoji: '🍡', category: 'kawaii' },
-  { id: 'k4', emoji: '🍓', category: 'kawaii' },
-  { id: 'k5', emoji: '🧸', category: 'kawaii' },
-  { id: 'k6', emoji: '🌈', category: 'kawaii' },
-  // Retro & Sunglasses
-  { id: 'r1', emoji: '📼', category: 'retro' },
-  { id: 'r2', emoji: '🪩', category: 'retro' },
-  { id: 'r3', emoji: '🕶️', category: 'retro' },
-  { id: 'r4', emoji: '🛼', category: 'retro' },
-  { id: 'r5', emoji: '📺', category: 'retro' },
-  // Tape & Effects
-  { id: 't1', emoji: '🩹', category: 'effects' },
-  { id: 't2', emoji: '📎', category: 'effects' },
-  { id: 't3', emoji: '📌', category: 'effects' },
-  { id: 't4', emoji: '🫧', category: 'effects' },
-  { id: 't5', emoji: '💨', category: 'effects' },
-  // Festival (Birthday/Wedding/Diwali)
-  { id: 'f1', emoji: '🎂', category: 'festival' },
-  { id: 'f2', emoji: '🎉', category: 'festival' },
-  { id: 'f3', emoji: '💍', category: 'festival' },
-  { id: 'f4', emoji: '🎆', category: 'festival' },
-  { id: 'f5', emoji: '🎓', category: 'festival' },
-  { id: 'f6', emoji: '🎄', category: 'festival' },
-  // Anime
-  { id: 'a1', emoji: '💢', category: 'anime' },
-  { id: 'a2', emoji: '💦', category: 'anime' },
-  { id: 'a3', emoji: '💤', category: 'anime' },
-  { id: 'a4', emoji: '💬', category: 'anime' },
-  { id: 'a5', emoji: '🌀', category: 'anime' },
-];
-
-export const STICKER_CATEGORIES = ['hearts', 'stars', 'emoji', 'kawaii', 'retro', 'effects', 'festival', 'anime'];
+import { EXTENDED_STICKERS, EXTENDED_STICKER_CATEGORIES } from './stickers';
+export const STICKERS = EXTENDED_STICKERS;
+export const STICKER_CATEGORIES = EXTENDED_STICKER_CATEGORIES;
 
 export const FONTS = [
   // Aesthetic

@@ -93,13 +93,13 @@ export default function Footer() {
           flexWrap: 'wrap', gap: '12px',
         }}>
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            © {year} Boothly. Made with ❤️ for moments worth keeping.
+            © {year} Boothly v2.0 • Developed By Yash Bachwani. Made with ❤️ for moments worth keeping.
           </span>
           <span style={{
             fontSize: '0.8rem', color: 'var(--text-muted)',
             fontFamily: 'Space Mono, monospace',
           }}>
-            ✦ boothly
+            v2.0 ✦ boothly
           </span>
         </div>
       </div>

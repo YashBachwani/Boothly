@@ -5,9 +5,10 @@ import { useTheme } from '../../context/ThemeContext';
 
 const BGM_TRACKS = [
   { id: 'none', name: 'No Music', url: '' },
-  { id: 'chill', name: 'Chill Vibes', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-  { id: 'upbeat', name: 'Upbeat Pop', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-  { id: 'synth', name: 'Synthwave', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+  { id: 'goldenhour', name: 'Golden Hour', url: '/music/GoldenHour.mp3' },
+  { id: 'heeriye', name: 'Heeriye', url: '/music/Heeriye.mp3' },
+  { id: 'lagjaagale', name: 'Lag Jaa Gale', url: '/music/Lag%20Jaa%20Gale.mp3' },
+  { id: 'untilifoundyou', name: 'Until I Found You', url: '/music/Until-I-Found-You.mp3' },
 ];
 
 export default function Navbar() {
@@ -79,7 +80,7 @@ export default function Navbar() {
 
       {/* Right controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        
+
         {/* Hidden Audio Element */}
         <audio ref={audioRef} loop />
 

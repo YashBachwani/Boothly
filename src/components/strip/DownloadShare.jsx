@@ -107,7 +107,7 @@ export default function DownloadShare() {
       </div>
 
       {/* Action panel */}
-      <div className="glass-card" style={{ padding: '32px', minWidth: '300px', maxWidth: '400px' }}>
+      <div className="glass-card download-share-card" style={{ padding: '32px', minWidth: '280px', maxWidth: '400px' }}>
         <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.8rem', color: 'var(--text-primary)', marginBottom: '8px' }}>
           Your <span className="gradient-text">memories</span>, ready.
         </h3>
@@ -156,6 +156,17 @@ export default function DownloadShare() {
           </motion.button>
         </div>
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 600px) {
+          .download-share-card {
+            padding: 20px 16px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+          }
+        }
+      `}} />
     </motion.div>
   );
 }

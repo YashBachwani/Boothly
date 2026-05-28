@@ -60,6 +60,7 @@ function ParticleCanvas() {
 function FloatingStrip({ images, style, rotation = 0, delay = 0 }) {
   return (
     <motion.div
+      className="floating-strip"
       animate={{ y: [0, -16, 0], rotate: [rotation, rotation + 2, rotation] }}
       transition={{ duration: 6 + delay, repeat: Infinity, ease: 'easeInOut', delay }}
       style={{
@@ -267,6 +268,14 @@ export default function Hero() {
           color: 'var(--text-muted)', fontSize: '22px',
         }}
       >↓</motion.div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 900px) {
+          .floating-strip {
+            display: none !important;
+          }
+        }
+      `}} />
     </section>
   );
 }

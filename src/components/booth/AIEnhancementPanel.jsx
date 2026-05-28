@@ -39,9 +39,10 @@ function Toggle({ checked, onChange }) {
   );
 }
 
-export default function AIEnhancementPanel() {
+export default function AIEnhancementPanel({ inline = false }) {
   const {
     photos, setPhotos,
+    originalPhotos, setOriginalPhotos,
     enhancements, setEnhancements,
     enhancementIntensity, setEnhancementIntensity,
     enhancementsEnabled, setEnhancementsEnabled,
@@ -73,24 +74,47 @@ export default function AIEnhancementPanel() {
   }, [expanded, enhancements, enhancementIntensity, photos]);
 
   const handleApply = async () => {
-    if (!photos.length || applying) return;
+    // If no photos taken yet (e.g. configuring enhancements on the camera view)
+    if (photos.length === 0) {
+      setEnhancementsEnabled(true);
+      setExpanded(false);
+      return;
+    }
+
+    if (applying) return;
     setApplying(true);
     try {
+      // Use originalPhotos as pristine base to avoid compounded enhancements
+      const basePhotos = originalPhotos && originalPhotos.length > 0 ? originalPhotos : photos;
+      
       const enhanced = await Promise.all(
-        photos.map(async (dataUrl) => {
+        basePhotos.map(async (dataUrl) => {
           const { enhanced } = await generateEnhancedPreview(dataUrl, enhancements, enhancementIntensity);
           return enhanced;
         })
       );
+      
+      if (!originalPhotos || originalPhotos.length === 0) {
+        setOriginalPhotos(basePhotos);
+      }
+      
       setPhotos(enhanced);
       setEnhancementsEnabled(true);
       setExpanded(false);
+    } catch (e) {
+      console.error('AI Enhancement apply failed:', e);
     } finally {
       setApplying(false);
     }
   };
 
   const handleReset = () => {
+    if (originalPhotos && originalPhotos.length > 0) {
+      setPhotos(originalPhotos);
+    }
+    const cleared = {};
+    ENHANCEMENT_LIST.forEach(e => { cleared[e.id] = false; });
+    setEnhancements(cleared);
     setEnhancementsEnabled(false);
     setExpanded(false);
   };
@@ -103,18 +127,49 @@ export default function AIEnhancementPanel() {
   };
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={inline ? { width: '100%' } : { position: 'relative' }}>
       {/* Trigger button */}
       <motion.button
         className="btn btn-ghost btn-sm"
         onClick={() => setExpanded(e => !e)}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.95 }}
-        style={{ display: 'flex', alignItems: 'center', gap: '6px', position: 'relative' }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: inline ? 'space-between' : 'center',
+          width: inline ? '100%' : 'auto',
+          padding: inline ? '12px 16px' : '8px 12px',
+          borderRadius: inline ? '10px' : '99px',
+          border: inline ? '1.5px solid var(--border-subtle)' : 'none',
+          background: inline ? 'var(--bg-glass)' : 'transparent',
+          position: 'relative',
+          cursor: 'pointer',
+        }}
       >
-        <span>🤖</span>
-        <span style={{ fontSize: '0.82rem' }}>Enhance</span>
-        {activeCount > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>🤖</span>
+          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+            {inline ? 'AI Enhance Options' : 'Enhance'}
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {activeCount > 0 && inline && (
+            <span style={{
+              padding: '2px 8px',
+              borderRadius: '20px',
+              background: enhancementsEnabled ? 'var(--accent-neon)' : 'var(--accent-pink-deep)',
+              fontSize: '0.68rem',
+              color: '#000',
+              fontWeight: 800,
+            }}>
+              {activeCount} active
+            </span>
+          )}
+          {inline && <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>{expanded ? '▲' : '▼'}</span>}
+        </div>
+        
+        {activeCount > 0 && !inline && (
           <motion.span
             initial={{ scale: 0 }} animate={{ scale: 1 }}
             style={{
@@ -135,11 +190,22 @@ export default function AIEnhancementPanel() {
       <AnimatePresence>
         {expanded && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 8 }}
-            transition={{ duration: 0.22, ease: 'easeOut' }}
-            style={{
+            initial={{ opacity: 0, y: -4, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            style={inline ? {
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '12px',
+              padding: '16px',
+              marginTop: '8px',
+              display: 'flex',
+              flexDirection: 'column',
+              width: '100%',
+              zIndex: 10,
+              boxSizing: 'border-box',
+            } : {
               position: 'absolute',
               bottom: 'calc(100% + 10px)',
               right: '0',
