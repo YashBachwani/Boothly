@@ -10,9 +10,17 @@ const initialState = {
   stripLayout: 'vertical',
   stripTheme: 'minimal',
   stickers: [],
+  textLayers: [],
   customText: '',
   boothFrame: 'none',
   sessionId: null,
+  // New States
+  enhancements: {},
+  enhancementIntensity: 0.6,
+  enhancementsEnabled: false,
+  currentBackground: 'none',
+  currentMusic: 'none',
+  isMuted: false,
 };
 
 function boothReducer(state, action) {
@@ -26,10 +34,19 @@ function boothReducer(state, action) {
     case 'SET_THEME': return { ...state, stripTheme: action.payload };
     case 'SET_STICKERS': return { ...state, stickers: action.payload };
     case 'ADD_STICKER': return { ...state, stickers: [...state.stickers, action.payload] };
+    case 'SET_TEXT_LAYERS': return { ...state, textLayers: action.payload };
     case 'SET_CUSTOM_TEXT': return { ...state, customText: action.payload };
     case 'SET_FRAME': return { ...state, boothFrame: action.payload };
-    case 'RESET_SESSION': return { ...initialState, step: 'select' };
-    case 'NEW_SESSION': return { ...initialState, sessionId: Date.now() };
+    case 'RESET_SESSION': return { ...initialState, step: 'select', currentBackground: state.currentBackground, currentMusic: state.currentMusic, isMuted: state.isMuted };
+    case 'NEW_SESSION': return { ...initialState, sessionId: Date.now(), currentBackground: state.currentBackground, currentMusic: state.currentMusic, isMuted: state.isMuted };
+    // Enhancement actions
+    case 'SET_ENHANCEMENTS': return { ...state, enhancements: action.payload };
+    case 'SET_ENHANCEMENT_INTENSITY': return { ...state, enhancementIntensity: action.payload };
+    case 'SET_ENHANCEMENTS_ENABLED': return { ...state, enhancementsEnabled: action.payload };
+    // Background & Music actions
+    case 'SET_CURRENT_BACKGROUND': return { ...state, currentBackground: action.payload };
+    case 'SET_CURRENT_MUSIC': return { ...state, currentMusic: action.payload };
+    case 'SET_IS_MUTED': return { ...state, isMuted: action.payload };
     default: return state;
   }
 }
@@ -46,18 +63,29 @@ export function BoothProvider({ children }) {
   const setTheme = (theme) => dispatch({ type: 'SET_THEME', payload: theme });
   const addSticker = (sticker) => dispatch({ type: 'ADD_STICKER', payload: sticker });
   const setStickers = (stickers) => dispatch({ type: 'SET_STICKERS', payload: stickers });
+  const setTextLayers = (layers) => dispatch({ type: 'SET_TEXT_LAYERS', payload: layers });
   const setCustomText = (text) => dispatch({ type: 'SET_CUSTOM_TEXT', payload: text });
   const setFrame = (frame) => dispatch({ type: 'SET_FRAME', payload: frame });
   const resetSession = () => dispatch({ type: 'RESET_SESSION' });
   const newSession = () => dispatch({ type: 'NEW_SESSION' });
+  
+  const setEnhancements = (enh) => dispatch({ type: 'SET_ENHANCEMENTS', payload: enh });
+  const setEnhancementIntensity = (intensity) => dispatch({ type: 'SET_ENHANCEMENT_INTENSITY', payload: intensity });
+  const setEnhancementsEnabled = (enabled) => dispatch({ type: 'SET_ENHANCEMENTS_ENABLED', payload: enabled });
+  
+  const setCurrentBackground = (bg) => dispatch({ type: 'SET_CURRENT_BACKGROUND', payload: bg });
+  const setCurrentMusic = (music) => dispatch({ type: 'SET_CURRENT_MUSIC', payload: music });
+  const setIsMuted = (muted) => dispatch({ type: 'SET_IS_MUTED', payload: muted });
 
   return (
     <BoothContext.Provider value={{
       ...state,
       setStep, setPhotoCount, addPhoto, setPhotos,
       setFilter, setLayout, setTheme, addSticker,
-      setStickers, setCustomText, setFrame,
+      setStickers, setTextLayers, setCustomText, setFrame,
       resetSession, newSession,
+      setEnhancements, setEnhancementIntensity, setEnhancementsEnabled,
+      setCurrentBackground, setCurrentMusic, setIsMuted,
     }}>
       {children}
     </BoothContext.Provider>

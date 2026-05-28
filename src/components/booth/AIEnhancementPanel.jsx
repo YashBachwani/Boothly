@@ -142,8 +142,7 @@ export default function AIEnhancementPanel() {
             style={{
               position: 'absolute',
               bottom: 'calc(100% + 10px)',
-              left: '50%',
-              transform: 'translateX(-50%)',
+              right: '0',
               zIndex: 200,
               background: 'var(--bg-card)',
               backdropFilter: 'blur(24px)',

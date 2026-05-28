@@ -6,12 +6,16 @@ import { useCountdown } from '../../hooks/useCountdown';
 import { useAudio } from '../../hooks/useAudio';
 import { FILTERS } from '../../constants';
 import FilterPanel from '../filters/FilterPanel';
+import AIEnhancementPanel from './AIEnhancementPanel';
+import VirtualBackgroundPanel from './VirtualBackgroundPanel';
+import MusicPlayer from './MusicPlayer';
+import { VIRTUAL_BACKGROUNDS } from '../../constants/backgrounds';
 
 export default function CameraView() {
-  const { photoCount, currentFilter, addPhoto, setStep } = useBooth();
+  const { photoCount, currentFilter, addPhoto, setStep, currentBackground, setCurrentBackground, currentMusic, setCurrentMusic, isMuted, setIsMuted } = useBooth();
   const { videoRef, isReady, error, startCamera, flipCamera, hasMultipleCameras, capturePhoto } = useCamera();
   const { count, isRunning, isFlashing, runSession } = useCountdown();
-  const { playShutter, playCountdownBeep } = useAudio();
+  const { playShutter, playCountdownBeep, playBackgroundMusic, setMuted } = useAudio();
   
   const [photosTaken, setPhotosTaken] = useState(0);
 
@@ -25,14 +29,25 @@ export default function CameraView() {
     }
   }, [count, playCountdownBeep]);
 
+  // Sync mute state with audio context
+  useEffect(() => {
+    setMuted(isMuted);
+  }, [isMuted, setMuted]);
+
+  // Handle background music playing
+  useEffect(() => {
+    playBackgroundMusic(currentMusic);
+  }, [currentMusic, playBackgroundMusic]);
+
   const activeFilterCss = FILTERS.find(f => f.id === currentFilter)?.css || 'none';
+  const activeBg = VIRTUAL_BACKGROUNDS.find(b => b.id === currentBackground) || VIRTUAL_BACKGROUNDS[0];
 
   const handleStartSession = () => {
     runSession(
       photoCount,
       () => {
         playShutter();
-        return capturePhoto(currentFilter);
+        return capturePhoto(currentFilter, currentBackground);
       },
       (photo, numTaken) => {
         addPhoto(photo);
@@ -62,15 +77,22 @@ export default function CameraView() {
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px', gap: '16px', position: 'relative' }}>
       
       {/* Top bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 8px' }}>
-        <div className="pill">
-          Photo {Math.min(photosTaken + 1, photoCount)} of {photoCount}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div className="pill" style={{ margin: 0 }}>
+            {Math.min(photosTaken + 1, photoCount)} / {photoCount}
+          </div>
+          <VirtualBackgroundPanel selected={currentBackground} onChange={setCurrentBackground} disabled={isRunning} />
         </div>
-        {hasMultipleCameras && !isRunning && (
-          <button className="btn btn-ghost btn-sm" onClick={flipCamera}>
-            🔄 Flip Camera
-          </button>
-        )}
+        
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <MusicPlayer currentTrack={currentMusic} onTrackChange={setCurrentMusic} isMuted={isMuted} onToggleMute={() => setIsMuted(!isMuted)} />
+          {hasMultipleCameras && !isRunning && (
+            <button className="btn btn-ghost btn-sm" onClick={flipCamera} style={{ fontSize: '0.8rem', padding: '6px 10px' }}>
+              🔄 Flip
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Camera container */}
@@ -87,6 +109,15 @@ export default function CameraView() {
           </div>
         )}
 
+        {/* Virtual Background Render */}
+        {activeBg.id !== 'none' && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: activeBg.css,
+            zIndex: 1, pointerEvents: 'none',
+          }} />
+        )}
+
         <video
           ref={videoRef}
           playsInline
@@ -96,8 +127,60 @@ export default function CameraView() {
             filter: activeFilterCss,
             transform: 'scaleX(-1)', // Mirror front camera by default
             opacity: isReady ? 1 : 0, transition: 'opacity 0.4s',
+            zIndex: 2,
+            mixBlendMode: activeBg.id !== 'none' ? 'soft-light' : 'normal', // Blend video into background
           }}
         />
+
+        {/* Floating Emojis for Virtual Background */}
+        <AnimatePresence>
+          {activeBg.emoji && activeBg.emoji.length > 0 && !isRunning && (
+            <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 3, pointerEvents: 'none' }}>
+              {activeBg.emoji.map((emj, i) => (
+                <motion.div
+                  key={`${activeBg.id}-${i}`}
+                  initial={{ y: '110%', x: Math.random() * 80 + 10 + '%', opacity: 0, scale: 0.5 }}
+                  animate={{ 
+                    y: '-10%', 
+                    x: Math.random() * 80 + 10 + '%', 
+                    opacity: [0, 0.8, 0],
+                    scale: [0.5, 1.2, 0.8],
+                    rotate: Math.random() * 360
+                  }}
+                  transition={{ 
+                    duration: Math.random() * 4 + 4,
+                    repeat: Infinity,
+                    delay: i * 1.5,
+                    ease: 'linear'
+                  }}
+                  style={{
+                    position: 'absolute',
+                    fontSize: '2rem',
+                    filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))'
+                  }}
+                >
+                  {emj}
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Ambient Overlay to tint the scene */}
+        {activeBg.ambientColor && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: activeBg.ambientColor,
+            zIndex: 4, pointerEvents: 'none', mixBlendMode: 'overlay'
+          }} />
+        )}
+        {activeBg.overlay && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: activeBg.overlay,
+            zIndex: 5, pointerEvents: 'none'
+          }} />
+        )}
 
         {/* Flash Overlay */}
         <AnimatePresence>
@@ -136,8 +219,13 @@ export default function CameraView() {
       </div>
 
       {/* Controls / Filters */}
-      <div style={{ height: '120px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <FilterPanel disabled={isRunning} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '8px' }}>
+          <div style={{ flex: 1, overflowX: 'auto', paddingBottom: '4px' }}>
+            <FilterPanel disabled={isRunning} />
+          </div>
+          <AIEnhancementPanel />
+        </div>
         
         {!isRunning && (
           <div style={{ display: 'flex', justifyContent: 'center' }}>

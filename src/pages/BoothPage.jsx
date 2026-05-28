@@ -6,7 +6,6 @@ import PhotoCountSelector from '../components/booth/PhotoCountSelector';
 import CameraView from '../components/booth/CameraView';
 import PrintAnimation from '../components/booth/PrintAnimation';
 import StripThemer from '../components/strip/StripThemer';
-import StickerLayer from '../components/strip/StickerLayer';
 import DownloadShare from '../components/strip/DownloadShare';
 import StripCanvas from '../components/strip/StripCanvas';
 
@@ -47,7 +46,6 @@ export default function BoothPage() {
             {/* The strip preview */}
             <div style={{ position: 'relative', flexShrink: 0 }}>
               <StripCanvas />
-              <StickerLayer />
             </div>
             {/* Customization controls */}
             <div style={{ flex: 1, minWidth: '300px', maxWidth: '400px' }}>

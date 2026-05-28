@@ -2,15 +2,22 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBooth } from '../../context/BoothContext';
 import { STICKERS, STICKER_CATEGORIES } from '../../constants';
+import TransformBox from './TransformBox';
 
-export default function StickerLayer({ readOnly = false }) {
+export default function StickerLayer({ readOnly = false, scaleFactor = 1 }) {
   const { stickers, setStickers } = useBooth();
   const [activeCategory, setActiveCategory] = useState(STICKER_CATEGORIES[0]);
   const [showPicker, setShowPicker] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   const layerRef = useRef(null);
 
   const addSticker = (emoji) => {
-    setStickers([...stickers, { id: Date.now(), emoji, x: 50, y: 50, scale: 1, rotate: 0 }]);
+    setStickers([...stickers, { 
+      id: Date.now(), emoji, 
+      x: 50, y: 50, 
+      scale: 1, rotate: 0, 
+      opacity: 1, flipX: false, zIndex: stickers.length 
+    }]);
     setShowPicker(false);
   };
 
@@ -20,14 +27,27 @@ export default function StickerLayer({ readOnly = false }) {
 
   const removeSticker = (id) => {
     setStickers(stickers.filter(s => s.id !== id));
+    if (selectedId === id) setSelectedId(null);
+  };
+
+  const bringForward = (id) => {
+    const s = stickers.find(s => s.id === id);
+    if (s) updateSticker(id, { zIndex: s.zIndex + 1 });
+  };
+
+  const sendBackward = (id) => {
+    const s = stickers.find(s => s.id === id);
+    if (s && s.zIndex > 0) updateSticker(id, { zIndex: s.zIndex - 1 });
   };
 
   return (
     <>
-      {/* Container overlay over the strip canvas */}
       <div
         id="sticker-layer"
         ref={layerRef}
+        onClick={(e) => {
+          if (e.target.id === 'sticker-layer') setSelectedId(null);
+        }}
         style={{
           position: 'absolute', inset: 0,
           pointerEvents: 'none',
@@ -35,7 +55,7 @@ export default function StickerLayer({ readOnly = false }) {
           zIndex: 10,
         }}
       >
-        {stickers.map((sticker, i) => {
+        {stickers.sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0)).map((sticker) => {
           if (readOnly) {
             return (
               <div
@@ -43,9 +63,12 @@ export default function StickerLayer({ readOnly = false }) {
                 style={{
                   position: 'absolute',
                   top: `${sticker.y}%`, left: `${sticker.x}%`,
-                  fontSize: '48px',
+                  fontSize: `${48 * scaleFactor}px`,
                   lineHeight: 1,
                   userSelect: 'none',
+                  transform: `translate(-50%, -50%) scale(${sticker.scale || 1}) rotate(${sticker.rotate || 0}deg) scaleX(${sticker.flipX ? -1 : 1})`,
+                  opacity: sticker.opacity !== undefined ? sticker.opacity : 1,
+                  zIndex: sticker.zIndex || 0
                 }}
               >
                 {sticker.emoji}
@@ -53,42 +76,29 @@ export default function StickerLayer({ readOnly = false }) {
             );
           }
 
+          const isSelected = selectedId === sticker.id;
+
           return (
-            <motion.div
-              key={`${sticker.id}-${sticker.x}-${sticker.y}`}
-              drag
-              dragMomentum={false}
-              dragConstraints={layerRef}
-              onDragEnd={(e, info) => {
-                if (!layerRef.current) return;
-                const rect = layerRef.current.getBoundingClientRect();
-                const newX = sticker.x + (info.offset.x / rect.width) * 100;
-                const newY = sticker.y + (info.offset.y / rect.height) * 100;
-                updateSticker(sticker.id, { x: newX, y: newY });
-              }}
-              style={{
-                position: 'absolute',
-                top: `${sticker.y}%`, left: `${sticker.x}%`,
-                fontSize: '48px',
-                pointerEvents: 'auto',
-                cursor: 'grab',
-                userSelect: 'none',
-                lineHeight: 1,
-              }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ cursor: 'grabbing', scale: 0.9 }}
-              onDoubleClick={() => removeSticker(sticker.id)}
+            <TransformBox
+              key={sticker.id}
+              item={sticker}
+              isSelected={isSelected}
+              onSelect={(id = sticker.id) => setSelectedId(id)}
+              updateItem={updateSticker}
+              onDelete={() => removeSticker(sticker.id)}
+              onDuplicate={() => addSticker(sticker.emoji)}
+              onLayerUp={() => bringForward(sticker.id)}
+              onLayerDown={() => sendBackward(sticker.id)}
+              layerRef={layerRef}
             >
-              {sticker.emoji}
-              <div style={{ position: 'absolute', bottom: '-10px', left: '50%', transform: 'translateX(-50%)', fontSize: '10px', background: 'rgba(0,0,0,0.5)', color: '#fff', padding: '2px 4px', borderRadius: '4px', opacity: 0, transition: 'opacity 0.2s', whiteSpace: 'nowrap' }} className="sticker-hint">
-                Double click to delete
+              <div style={{ fontSize: `${48 * scaleFactor}px`, lineHeight: 1 }}>
+                {sticker.emoji}
               </div>
-            </motion.div>
+            </TransformBox>
           );
         })}
       </div>
 
-      {/* Floating Add Sticker Button */}
       {!readOnly && (
         <motion.button
           className="btn btn-primary"
@@ -120,7 +130,6 @@ export default function StickerLayer({ readOnly = false }) {
                 display: 'flex', flexDirection: 'column', gap: '12px',
               }}
             >
-              {/* Categories */}
               <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }} className="hide-scrollbar">
                 {STICKER_CATEGORIES.map(cat => (
                   <button
@@ -138,7 +147,6 @@ export default function StickerLayer({ readOnly = false }) {
                 ))}
               </div>
 
-              {/* Stickers Grid */}
               <div style={{
                 display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
                 gap: '8px', maxHeight: '160px', overflowY: 'auto',
@@ -160,21 +168,17 @@ export default function StickerLayer({ readOnly = false }) {
                   </motion.button>
                 ))}
               </div>
-              
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '8px' }}>
-                Double-click a sticker to remove it
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
       )}
-      
-      {!readOnly && (
-        <style dangerouslySetInnerHTML={{__html:`
-          .sticker-hint { opacity: 0; }
-          div:hover > .sticker-hint { opacity: 1; }
-        `}} />
-      )}
+      <style dangerouslySetInnerHTML={{__html:`
+        .icon-btn {
+          background: transparent; border: none; font-size: 14px; cursor: pointer; padding: 2px;
+          border-radius: 4px; display: flex; align-items: center; justify-content: center;
+        }
+        .icon-btn:hover { background: rgba(255,255,255,0.1); }
+      `}} />
     </>
   );
 }
