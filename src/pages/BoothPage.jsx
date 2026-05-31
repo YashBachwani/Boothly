@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBooth } from '../context/BoothContext';
 import BoothEntry from '../components/booth/BoothEntry';
 import PhotoCountSelector from '../components/booth/PhotoCountSelector';
+import SourceSelector from '../components/booth/SourceSelector';
 import CameraView from '../components/booth/CameraView';
+import GalleryUpload from '../components/booth/GalleryUpload';
 import PrintAnimation from '../components/booth/PrintAnimation';
 import StripCanvas from '../components/strip/StripCanvas';
 import EditorSidePanel from '../components/strip/EditorSidePanel';
@@ -35,7 +37,9 @@ export default function BoothPage() {
       <AnimatePresence mode="wait">
         {step === 'entry'  && <BoothEntry key="entry" />}
         {step === 'select' && <PhotoCountSelector key="select" />}
+        {step === 'source' && <SourceSelector key="source" />}
         {step === 'camera' && <CameraView key="camera" />}
+        {step === 'upload' && <GalleryUpload key="upload" />}
         {step === 'print'  && <PrintAnimation key="print" />}
 
         {step === 'customize' && (

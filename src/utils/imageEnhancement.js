@@ -273,3 +273,51 @@ export async function generateEnhancedPreview(dataUrl, options, intensity) {
     img.src = dataUrl;
   });
 }
+
+// ── Process Uploaded Photo ────────────────────────────────────────────────────
+// Reads a File object, applies smart crop + auto-optimizations, returns { raw, enhanced }
+
+export async function processUploadedPhoto(file, targetRatio = 4 / 3) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.onload = () => {
+        // Target canvas dimensions (max 1280 wide)
+        const maxW = 1280;
+        const maxH = Math.round(maxW / targetRatio);
+
+        // Smart crop region
+        const crop = getSmartCropRegion(img.width, img.height, targetRatio);
+
+        // Raw canvas — cropped but no enhancements
+        const rawCanvas = document.createElement('canvas');
+        rawCanvas.width = maxW;
+        rawCanvas.height = maxH;
+        const rawCtx = rawCanvas.getContext('2d');
+        rawCtx.drawImage(img, crop.sx, crop.sy, crop.sw, crop.sh, 0, 0, maxW, maxH);
+        const raw = rawCanvas.toDataURL('image/jpeg', 0.93);
+
+        // Enhanced canvas — cropped + optimized
+        const enhCanvas = document.createElement('canvas');
+        enhCanvas.width = maxW;
+        enhCanvas.height = maxH;
+        const enhCtx = enhCanvas.getContext('2d');
+        enhCtx.drawImage(img, crop.sx, crop.sy, crop.sw, crop.sh, 0, 0, maxW, maxH);
+
+        // Apply auto-optimizations at moderate intensity
+        applyAutoBrightness(enhCtx, maxW, maxH, 0.5);
+        applyAutoContrast(enhCtx, maxW, maxH, 0.5);
+        applyColorEnhancement(enhCtx, maxW, maxH, 0.4);
+
+        const enhanced = enhCanvas.toDataURL('image/jpeg', 0.93);
+
+        resolve({ raw, enhanced });
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}

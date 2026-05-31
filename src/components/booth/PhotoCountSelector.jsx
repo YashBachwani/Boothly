@@ -7,7 +7,7 @@ export default function PhotoCountSelector() {
 
   const handleSelect = (count) => {
     setPhotoCount(count);
-    setStep('camera');
+    setStep('source');
   };
 
   return (

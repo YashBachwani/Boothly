@@ -3,7 +3,8 @@ import React, { createContext, useContext, useReducer } from 'react';
 const BoothContext = createContext();
 
 const initialState = {
-  step: 'landing', // 'landing' | 'entry' | 'select' | 'camera' | 'print' | 'customize' | 'result'
+  step: 'landing', // 'landing' | 'entry' | 'select' | 'source' | 'camera' | 'upload' | 'print' | 'customize' | 'result'
+  captureMode: null, // 'camera' | 'gallery'
   photoCount: 4,
   photos: [],
   originalPhotos: [],
@@ -27,6 +28,7 @@ const initialState = {
 function boothReducer(state, action) {
   switch (action.type) {
     case 'SET_STEP': return { ...state, step: action.payload };
+    case 'SET_CAPTURE_MODE': return { ...state, captureMode: action.payload };
     case 'SET_PHOTO_COUNT': return { ...state, photoCount: action.payload };
     case 'ADD_PHOTO': return { ...state, photos: [...state.photos, action.payload], originalPhotos: [...state.originalPhotos, action.payload] };
     case 'ADD_PHOTO_DUAL': return { ...state, photos: [...state.photos, action.payload.enhanced], originalPhotos: [...state.originalPhotos, action.payload.raw] };
@@ -40,7 +42,7 @@ function boothReducer(state, action) {
     case 'SET_TEXT_LAYERS': return { ...state, textLayers: action.payload };
     case 'SET_CUSTOM_TEXT': return { ...state, customText: action.payload };
     case 'SET_FRAME': return { ...state, boothFrame: action.payload };
-    case 'RESET_SESSION': return { ...initialState, step: 'select', currentBackground: state.currentBackground, currentMusic: state.currentMusic, isMuted: state.isMuted };
+    case 'RESET_SESSION': return { ...initialState, step: 'select', captureMode: null, currentBackground: state.currentBackground, currentMusic: state.currentMusic, isMuted: state.isMuted };
     case 'NEW_SESSION': return { ...initialState, sessionId: Date.now(), currentBackground: state.currentBackground, currentMusic: state.currentMusic, isMuted: state.isMuted };
     // Enhancement actions
     case 'SET_ENHANCEMENTS': return { ...state, enhancements: action.payload };
@@ -59,6 +61,7 @@ export function BoothProvider({ children }) {
 
   const setStep = (step) => dispatch({ type: 'SET_STEP', payload: step });
   const setPhotoCount = (count) => dispatch({ type: 'SET_PHOTO_COUNT', payload: count });
+  const setCaptureMode = (mode) => dispatch({ type: 'SET_CAPTURE_MODE', payload: mode });
   const addPhoto = (photo) => dispatch({ type: 'ADD_PHOTO', payload: photo });
   const addPhotoDual = (raw, enhanced) => dispatch({ type: 'ADD_PHOTO_DUAL', payload: { raw, enhanced } });
   const setPhotos = (photos) => dispatch({ type: 'SET_PHOTOS', payload: photos });
@@ -85,7 +88,7 @@ export function BoothProvider({ children }) {
   return (
     <BoothContext.Provider value={{
       ...state,
-      setStep, setPhotoCount, addPhoto, addPhotoDual, setPhotos, setOriginalPhotos,
+      setStep, setPhotoCount, setCaptureMode, addPhoto, addPhotoDual, setPhotos, setOriginalPhotos,
       setFilter, setLayout, setTheme, addSticker,
       setStickers, setTextLayers, setCustomText, setFrame,
       resetSession, newSession,
